@@ -4,24 +4,25 @@ const calculator = document.querySelector('.calculator');    // ref calc div
 const keys = document.querySelector('.calculator__keys');    // ref calc__keys div
 const display = document.querySelector('.calculator__display');  // ref calc display
 
+
 keys.addEventListener('click', e => {
     if (e.target.matches('button')) {
-        const key = e.target;                  // ref key clicked   
-        const action = key.dataset.action;     // ref operator key (clicked)
-        const keyContent = key.textContent;    // ref key (clicked) text content
-        const displayedNum = display.textContent;    // ref calc display text content
-        const previousKeyType = calculator.dataset.previousKeyType;
+        const key = e.target;                                // ref key clicked  
+        
+        const action = key.dataset.action;                          // ref operator key
+        const keyContent = key.textContent;                         // ref key text content
+        const displayedNum = display.textContent;                   // ref calc display text content
+        const previousKeyType = calculator.dataset.previousKeyType;       // ref the previous-key-type attribute             
+        
 
-        if (!action) {                        // if a number key is clicked
-            if (displayedNum === '0') {        // if display shows 0 
-                display.textContent = keyContent;    // display show key text content
-                console.log('If disNum '+displayedNum);
-            } else if (previousKeyType === 'operator') {
-                display.textContent = keyContent;
-                console.log('Else If disNum '+displayedNum);
-            } else {                                                 // else if display doesn't show 0 (show a number instead)
-                display.textContent = displayedNum + keyContent;     // display show display text content (already there) plus key
-                console.log('Else disNum '+displayedNum);
+        if (!action) {                                                    // if a clicked button is a number key
+            calculator.dataset.previousKeyType = 'number';                // add custom attribute for number key                            
+            if (displayedNum === '0') {                                        // if display shows 0 
+                display.textContent = keyContent;                              // show key text content (number clicked)              
+            } else if (previousKeyType === 'operator') {                       // if previous key is an operator
+                display.textContent = keyContent;                              // show key text content (number clicked) on display                         
+            } else {                                                           // else if the previous button clicked is a number or decimal
+                display.textContent = displayedNum + keyContent;               // show previous number/numbers and current key number appended              
             }            
         }
 
@@ -31,43 +32,42 @@ keys.addEventListener('click', e => {
             action === 'multiply' ||
             action === 'divide'
         ) {
-            key.classList.add('is-depressed');
-            calculator.dataset.previousKeyType = 'operator';    // add custom attribute for operator key
-            calculator.dataset.firstValue = displayedNum;     // add custom attribute for first value
-            calculator.dataset.operator = action;           
-        }
+            key.classList.add('is-depressed');                     // make the buttons/keys depressed when clicked
+            calculator.dataset.previousKeyType = 'operator';       // add custom attribute previous-key-type to 'operate'
+            calculator.dataset.firstValue = displayedNum;         // add custom attribute first-value to displayed number
+            calculator.dataset.operator = action;                 // add custom attribute operator and make it equal to action variable
+        }        
 
-        Array.from(key.parentNode.children).forEach(k => k.classList.remove('is-depressed'));
-        
+        Array.from(key.parentNode.children).forEach(k => k.classList.remove('is-depressed'));    // undo keys depressed        
             
 
         if (action === 'decimal') {
-            display.textContent = displayedNum + '.';    // show display text content plus decimal            
+            display.textContent = displayedNum + '.';         // concatenate number and decimal to display         
         }
 
         if (action === 'clear') {
-            console.log('clear key');
+            display.textContent = 0;                    // reset display to 0 when AC button is clicked
         }
 
-        const calculate = (n1, operator, n2) => {
+        const calculate = (n1, operator, n2) => {            // function to do the calculations 
             let result = '';
             if (operator === 'add') {
-                result = n1 + n2;
+                result = parseFloat(n1) + parseFloat(n2);
             } else if (operator === 'subtract') {
-                result = n1 - n2;
+                result = parseFloat(n1) - parseFloat(n2);
             } else if (operator === 'multiply') {
-                result = n1 * n2;
+                result = parseFloat(n1) * parseFloat(n2);
             } else if (operator === 'divide') {
-                result = n1 / n2;
+                result = parseFloat(n1) / parseFloat(n2);
             }
             return result;
         }
 
-        if (action === 'calculate') {
+        if (action === 'calculate') {                             // if the = button is clicked, it will do a calculation of the last 2 numbers
             const firstValue = calculator.dataset.firstValue;
             const operator = calculator.dataset.operator;
             const secondValue = displayedNum;
-            display.textContent = calculate(firstValue, operator, secondValue);
+            display.textContent = calculate(firstValue, operator, secondValue);    // display result of the calculation
         }
         
     }
